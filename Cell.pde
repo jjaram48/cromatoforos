@@ -1,7 +1,15 @@
 //Program based on "Insane in the Chromatophores"
 
 // Declare
-cell [] cellcollection = new cell[20];
+float s = 0;   //Transmite los Avgs a los objetos
+float r = 20;  //Establece el radio de las cells
+
+int cellNumber = 90;
+
+float[] spec = new float[513];
+float[] avg = new float[cellNumber];
+
+cell [] cellcollection = new cell[cellNumber];
 
 import ddf.minim.analysis.*;
 import ddf.minim.*;
@@ -11,13 +19,10 @@ AudioPlayer jingle;
 AudioMetaData meta;
 FFT fft;
 
-float s = 0;   //Transmite los Avgs a los objetos
-float r = 20;  //Establece el radio de las cells
-float[] spec = new float[513];
-float[] avg = new float[3];
+
 
 void setup() {
-  size (800, 600);
+  size (1400, 800);
   noStroke();
 
   minim = new Minim(this);
@@ -29,13 +34,9 @@ void setup() {
 
   // Initialize
   for(int i = 0; i < cellcollection.length; i++){
-  cellcollection[i] = new cell(random(0, width), random(0, height), random(2,10));
+  cellcollection[i] = new cell(random(0, width), random(0, height), random(2,10), random(0,7), random(0.001,0.5));
   }
-  /*
-  cell1 = new cell(width/4, height/2, 20);
-  cell2 = new cell(2 * width/4, height/2, 20);
-  cell3 = new cell(3 * width/4, height/2, 20);
-  */
+
 }
 
 
@@ -48,6 +49,12 @@ void analyzer() {
 
   float sum = 0;
 
+  for (int j = (fft.specSize ()/cellNumber); j < (2 * fft.specSize ()/3); j++) {
+    sum = abs(sum + spec[j]);
+    avg[0] = sum;
+  }
+  
+  /*
   for (int i = 0; i < fft.specSize ()/3; i++) {
     sum = abs(sum + spec[i]);
     avg[0] = sum;
@@ -64,6 +71,7 @@ void analyzer() {
     sum = abs(sum + spec[i]);
     avg[2] = sum;
   }
+  //*/
 }
 
 void draw() {
@@ -73,12 +81,5 @@ void draw() {
   for(int i = 0; i < cellcollection.length; i++){
   cellcollection[i].run(avg[0]);
   }
-  /*
-  cell1.run(avg[0]);
-  cell2.run(avg[1]*4);
-  cell3.run(avg[2]*8);
-  */
-  //println(fft.specSize(jingle.mix));
-  //println(fft.spectrum(jingle.mix));
 }
 
