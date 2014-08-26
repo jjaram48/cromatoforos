@@ -4,7 +4,7 @@
 float s = 0;   //Transmite los Avgs a los objetos
 float r = 20;  //Establece el radio de las cells
 
-int cellNumber = 90;
+int cellNumber = 200;
 
 float[] spec = new float[513];
 float[] avg = new float[cellNumber];
@@ -19,8 +19,6 @@ AudioPlayer jingle;
 AudioMetaData meta;
 FFT fft;
 
-
-
 void setup() {
   size (1400, 800);
   noStroke();
@@ -33,9 +31,17 @@ void setup() {
   meta = jingle.getMetaData();
 
   // Initialize
-  for(int i = 0; i < cellcollection.length; i++){
-  cellcollection[i] = new cell(random(0, width), random(0, height), random(2,10), random(0,7), random(0.001,0.5));
-  }
+  
+for (int i = 0; i < cellcollection.length; i++) {
+    cellcollection[i] = new cell(random(0, width), random(0, height), random(2, 2), random(0, 7), random(0.001, 0.01));
+  };
+  
+// Uncomment to see the whole spectrum arranged
+//int xp = 0;
+//  for (int i = 0; i < cellcollection.length; i++) {
+//    xp += width/cellNumber;
+//    cellcollection[i] = new cell(xp, height/2, random(2, 2), random(0, 7), random(0.001, 0.01));
+//  }
 
 }
 
@@ -49,37 +55,20 @@ void analyzer() {
 
   float sum = 0;
 
-  for (int j = (fft.specSize ()/cellNumber); j < (2 * fft.specSize ()/3); j++) {
-    sum = abs(sum + spec[j]);
-    avg[0] = sum;
-  }
-  
-  /*
-  for (int i = 0; i < fft.specSize ()/3; i++) {
-    sum = abs(sum + spec[i]);
-    avg[0] = sum;
-  }
-  
-  sum = 0;
-  for (int i = (fft.specSize ()/3); i < (2 * fft.specSize ()/3); i++) {
-    sum = abs(sum + spec[i]);
-    avg[1] = sum;
-  }
-  
-  sum = 0;
-  for (int i = 2 * fft.specSize ()/3; i < fft.specSize (); i++) {
-    sum = abs(sum + spec[i]);
-    avg[2] = sum;
-  }
-  //*/
+  for (int j = 0; j < cellNumber-1; ++j) {
+    for (int i = j* (fft.specSize ()/cellNumber); i < ((j+1) * fft.specSize ()/cellNumber); i++) {
+      sum = abs(sum + spec[i]);
+      avg[j] = sum;
+    };
+  };
 }
 
 void draw() {
   background(255);
   analyzer();
-  
-  for(int i = 0; i < cellcollection.length; i++){
-  cellcollection[i].run(avg[0]);
+
+  for (int i = 0; i < cellcollection.length; i++) {
+    cellcollection[i].run(avg[i]);
   }
-}
+};
 
